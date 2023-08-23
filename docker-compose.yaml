@@ -12,14 +12,16 @@ services:
     ports:
       - "8000:8000"
     command: sh -c "chmod +x /app/migrate.sh && sh /app/migrate.sh && /app/entrypoint.sh"
-    volumes:
-      - staticfiles: app/staticfiles/
   postgres_db:
     image: postgres
+    restart: always
+    command: -p 5434
     env_file:
       - URLShortenerService/.env
     expose:
-      - 5432
+      - 5434
+    ports:
+      - "5434:5434"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 
