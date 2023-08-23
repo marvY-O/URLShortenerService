@@ -28,6 +28,7 @@ class Convertor:
         result = 0
 
         for i, c in enumerate(reversed(s)):
+            if (c == '.'): return None
             result += charset.index(c) * (base ** i)
         
         return result
