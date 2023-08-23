@@ -1,0 +1,13 @@
+CSV File size = 20k;
+
+Init: Populate the databse with 10k url's first;
+Parameters: 
+    ShortURL = [short urls of already existing URL]
+Test:
+    a) Create New: /shorten/                
+        i) Get random url from actual CSV
+        ii) Send create request
+        iii) save short url in ShortURL 
+    b) access \<shorturl>
+        i) Get random ShortURL
+        ii) Send shorturl for redirect
