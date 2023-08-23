@@ -91,11 +91,11 @@ DATABASES = {
     }
 }
 
-DB_USERNAME = os.environ.get("MARIA_USER")
-DB_PASSWORD = os.environ.get("MARIA_PASSWORD")
-DB_DATABASE = os.environ.get("MARIA_DB")
-DB_HOST = os.environ.get("MARIA_HOST")
-DB_PORT = os.environ.get("MARIA_PORT")
+DB_USERNAME = os.environ.get("POSTGRES_USER")
+DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
+DB_DATABASE = os.environ.get("POSTGRES_DB")
+DB_HOST = os.environ.get("POSTGRES_HOST")
+DB_PORT = os.environ.get("POSTGRES_PORT")
 
 DB_IS_AVAIL = all([
     DB_USERNAME,
@@ -105,9 +105,9 @@ DB_IS_AVAIL = all([
     DB_PORT
 ])
 
-MARIA_READY = str(os.environ.get('MARIA_READY')) == "1"
+POSTGRES_READY = str(os.environ.get('POSTGRES_READY')) == "1"
 
-if DB_IS_AVAIL and MARIA_READY:
+if DB_IS_AVAIL and POSTGRES_READY:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -118,8 +118,6 @@ if DB_IS_AVAIL and MARIA_READY:
             'PORT': DB_PORT,
         }
     }
-
-print(DATABASES)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
