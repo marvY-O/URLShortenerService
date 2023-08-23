@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6fgmve^o_d47bw@%pdutksmliad+!j%^83b8f6c5k56n#xo6ie'
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = str(os.environ.get('DEBUG')) == "1"
 
 ALLOWED_HOSTS = []
 
@@ -76,16 +77,49 @@ WSGI_APPLICATION = 'URLShortenerService.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'urlservicedb',
-        'USER': 'marvy',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '3306',
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'urlservicedb',
+    #     'USER': 'marvy',
+    #     'PASSWORD': 'password',
+    #     'HOST': 'localhost',
+    #     'PORT': '3306',
+    # }
+    'default':{
+        'ENGINE':'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
+DB_USERNAME = os.environ.get("MARIA_USER")
+DB_PASSWORD = os.environ.get("MARIA_PASSWORD")
+DB_DATABASE = os.environ.get("MARIA_DB")
+DB_HOST = os.environ.get("MARIA_HOST")
+DB_PORT = os.environ.get("MARIA_PORT")
+
+DB_IS_AVAIL = all([
+    DB_USERNAME,
+    DB_PASSWORD,
+    DB_DATABASE,
+    DB_HOST,
+    DB_PORT
+])
+
+MARIA_READY = str(os.environ.get('MARIA_READY')) == "1"
+
+if DB_IS_AVAIL and MARIA_READY:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': DB_DATABASE,
+            'USER': DB_USERNAME,
+            'PASSWORD': DB_PASSWORD,
+            'HOST': DB_HOST,
+            'PORT': DB_PORT,
+        }
+    }
+
+print(DATABASES)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
