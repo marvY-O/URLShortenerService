@@ -2,29 +2,47 @@ version: '3.9'
 
 services:
   URLShortenerService:
-      container_name: URLService
-      depends_on:
-        postgres_db:
-          condition: service_healthy
-      build:
-        context: ./URLShortenerService
-        dockerfile: Dockerfile
-      image: url-shortener-service:v1
-      environment:
-        - PORT=8000
-      ports:
-        - "8000:8000"
-      command: sh -c "/app/wait-for-it.sh postgres_db:5432 -- sh -c 'chmod +x /app/migrate.sh && sh /app/migrate.sh && /app/entrypoint.sh'"
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    build:
+      context: ./URLShortenerService
+      dockerfile: Dockerfile
+    image: url-shortener-service:v1
+    environment:
+      - PORT=8000
+    networks:
+      - my-network
+    # command: sh -c "/app/wait-for-it.sh postgres_db:5432 -- sh -c 'chmod +x /app/migrate.sh && sh /app/migrate.sh && /app/entrypoint.sh'"
+    command: sh -c "chmod +x /app/migrate.sh && sh /app/migrate.sh && /app/entrypoint.sh"
 
   postgres_db:
     image: postgres:alpine
     container_name: postgres_db
     healthcheck:
-          test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
     env_file:
       - URLShortenerService/.env
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    networks:
+      - my-network
+
+  nginx:
+    image: nginx
+    depends_on:
+      - URLShortenerService
+    container_name: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
 
 volumes:
   postgres-data:
