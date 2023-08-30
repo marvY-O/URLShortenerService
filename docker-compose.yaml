@@ -1,31 +1,30 @@
-version: "3.9"
+version: '3.9'
+
 services:
   URLShortenerService:
-    depends_on:
-      - postgres_db
-    build:
-      context: ./URLShortenerService
-      dockerfile: Dockerfile
-    image: url-shortener-service:v1
-    environment:
-      - PORT=8000
-    ports:
-      - "8000:8000"
-    command: sh -c "chmod +x /app/migrate.sh && sh /app/migrate.sh && /app/entrypoint.sh"
+      container_name: URLService
+      depends_on:
+        postgres_db:
+          condition: service_healthy
+      build:
+        context: ./URLShortenerService
+        dockerfile: Dockerfile
+      image: url-shortener-service:v1
+      environment:
+        - PORT=8000
+      ports:
+        - "8000:8000"
+      command: sh -c "/app/wait-for-it.sh postgres_db:5432 -- sh -c 'chmod +x /app/migrate.sh && sh /app/migrate.sh && /app/entrypoint.sh'"
+
   postgres_db:
-    image: postgres
-    restart: always
-    command: -p 5434
+    image: postgres:alpine
+    container_name: postgres_db
+    healthcheck:
+          test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
     env_file:
       - URLShortenerService/.env
-    expose:
-      - 5434
-    ports:
-      - "5434:5434"
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
-
+      - postgres-data:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
-  
+  postgres-data:
