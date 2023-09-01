@@ -11,10 +11,10 @@ services:
     image: url-shortener-service:v1
     environment:
       - PORT=8000
-    networks:
-      - my-network
-    # command: sh -c "/app/wait-for-it.sh postgres_db:5432 -- sh -c 'chmod +x /app/migrate.sh && sh /app/migrate.sh && /app/entrypoint.sh'"
-    command: sh -c "chmod +x /app/migrate.sh && sh /app/migrate.sh && /app/entrypoint.sh"
+    # networks:
+    #   - my-network
+    command: sh -c "/app/wait-for-it.sh postgres_db:5432 -- sh -c 'chmod +x /app/migrate.sh && sh /app/migrate.sh && /app/entrypoint.sh'"
+    # command: sh -c "chmod +x /app/migrate.sh && sh /app/migrate.sh && /app/entrypoint.sh"
 
   postgres_db:
     image: postgres:alpine
@@ -25,8 +25,8 @@ services:
       - URLShortenerService/.env
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    networks:
-      - my-network
+    # networks:
+    #   - my-network
 
   nginx:
     image: nginx
@@ -37,12 +37,12 @@ services:
       - "8080:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    networks:
-      - my-network
+    # networks:
+    #   - my-network
 
-networks:
-  my-network:
-    driver: bridge
+# networks:
+#   my-network:
+#     driver: bridge
 
 volumes:
   postgres-data:
